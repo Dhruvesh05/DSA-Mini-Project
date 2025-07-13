@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import './App.css'; 
+import './App.css';
 
-const API_BASE = 'https://canteen-backend-i995.onrender.com'; 
+const API_BASE = 'https://canteen-backend-i995.onrender.com';
+
 function App() {
   const [menu, setMenu] = useState({});
   const [customerName, setCustomerName] = useState('');
@@ -16,18 +17,28 @@ function App() {
   }, []);
 
   const fetchMenu = async () => {
-    const res = await axios.get(`${API_BASE}/menu`);
-    setMenu(res.data);
+    try {
+      const res = await axios.get(`${API_BASE}/menu`);
+      setMenu(res.data);
+    } catch (err) {
+      console.error("Error fetching menu:", err);
+      setMessage("❌ Failed to load menu.");
+    }
   };
 
   const fetchQueue = async () => {
-    const res = await axios.get(`${API_BASE}/queue`);
-    setQueue(res.data);
+    try {
+      const res = await axios.get(`${API_BASE}/queue`);
+      setQueue(res.data);
+    } catch (err) {
+      console.error("Error fetching queue:", err);
+      setMessage("❌ Failed to load queue.");
+    }
   };
 
   const placeOrder = async () => {
     if (!customerName || !selectedItem) {
-      setMessage("Please enter your name and select a food item.");
+      setMessage("⚠️ Please enter your name and select a food item.");
       return;
     }
 
@@ -36,21 +47,27 @@ function App() {
         customerName,
         foodItem: selectedItem
       });
-      setMessage(`Order placed: ${res.data.order.foodItem} for ₹${res.data.order.price}`);
+
+      const order = res.data.order;
+      setMessage(`✅ Order placed: ${order.foodItem} for ₹${order.price}`);
       fetchQueue();
     } catch (err) {
-      setMessage("❌" + (err.response?.data?.error || "Error placing order"));
+      setMessage("❌ " + (err.response?.data?.error || "Error placing order"));
     }
   };
 
   const serveOrder = async () => {
-    const res = await axios.post(`${API_BASE}/serve`);
-    setMessage(res.data.message + (res.data.price ? ` | Total: ₹${res.data.price}` : ''));
-    fetchQueue();
+    try {
+      const res = await axios.post(`${API_BASE}/serve`);
+      setMessage(res.data.message + (res.data.price ? ` | Total: ₹${res.data.price}` : ''));
+      fetchQueue();
+    } catch (err) {
+      setMessage("❌ Error serving order");
+    }
   };
 
   return (
-    <div className="App" style={{ maxWidth: 600, alignItems: "center", padding: 20 }}>
+    <div className="App" style={{ maxWidth: 600, margin: '0 auto', padding: 20 }}>
       <h1>🍽 Canteen Ordering System</h1>
 
       <input
@@ -58,7 +75,7 @@ function App() {
         placeholder="Enter your name"
         value={customerName}
         onChange={(e) => setCustomerName(e.target.value)}
-        style={{ padding: 10, width: "96%", marginBottom: 10 }}
+        style={{ padding: 10, width: "100%", marginBottom: 10 }}
       />
 
       <select
@@ -67,19 +84,19 @@ function App() {
         style={{ padding: 10, width: "100%", marginBottom: 10 }}
       >
         <option value="">-- Select Food Item --</option>
-        {Object.entries(menu).map(([item, price]) => (
-          <option key={item} value={item}>
-            {item.charAt(0).toUpperCase() + item.slice(1)} - ₹{price}
+        {menu && Object.entries(menu).map(([key, item]) => (
+          <option key={key} value={item.name}>
+            {item.name.charAt(0).toUpperCase() + item.name.slice(1)} - ₹{item.price}
           </option>
         ))}
       </select>
 
       <button onClick={placeOrder} style={{ padding: 10, width: "100%", marginBottom: 10 }}>
-        Place Order
+        ✅ Place Order
       </button>
 
       <button onClick={serveOrder} style={{ padding: 10, width: "100%", marginBottom: 20 }}>
-        Serve Next Order
+        🍽 Serve Next Order
       </button>
 
       {message && <p><strong>{message}</strong></p>}
@@ -88,11 +105,10 @@ function App() {
       {queue.length === 0 ? (
         <p>No pending orders.</p>
       ) : (
-        <ul>
+        <ul style={{ paddingLeft: 20 }}>
           {queue.map((order, index) => (
-            <li key={index}>
-              <span>{order.customerName} - {order.foodItem}</span>
-              <span className="eta">ETA: {order.waitTime} mins</span>
+            <li key={index} style={{ marginBottom: 5 }}>
+              {order.customerName} - {order.foodItem} <span style={{ marginLeft: 10, color: 'gray' }}>ETA: {order.waitTime} mins</span>
             </li>
           ))}
         </ul>
