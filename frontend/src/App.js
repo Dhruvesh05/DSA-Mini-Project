@@ -50,7 +50,7 @@ function App() {
   };
 
   return (
-    <div className="App" style={{ maxWidth: 600, margin: "auto", padding: 20 }}>
+    <div className="App" style={{ maxWidth: 600, alignItems: "center", padding: 20 }}>
       <h1>🍽 Canteen Ordering System</h1>
 
       <input
@@ -58,7 +58,7 @@ function App() {
         placeholder="Enter your name"
         value={customerName}
         onChange={(e) => setCustomerName(e.target.value)}
-        style={{ padding: 10, width: "100%", marginBottom: 10 }}
+        style={{ padding: 10, width: "96%", marginBottom: 10 }}
       />
 
       <select
