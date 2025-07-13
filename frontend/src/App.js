@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './App.css'; 
 
-const API_BASE = 'https://canteen-backend-i995.onrender.com/'; 
+const API_BASE = ''; 
 function App() {
   const [menu, setMenu] = useState({});
   const [customerName, setCustomerName] = useState('');
@@ -91,7 +91,8 @@ function App() {
         <ul>
           {queue.map((order, index) => (
             <li key={index}>
-              {order.customerName} - {order.foodItem} (ETA: {order.waitTime} mins)
+              <span>{order.customerName} - {order.foodItem}</span>
+              <span className="eta">ETA: {order.waitTime} mins</span>
             </li>
           ))}
         </ul>
