@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import './App.css'; 
 
-const API_BASE = ''; 
+const API_BASE = 'https://canteen-backend-i995.onrender.com'; 
 function App() {
   const [menu, setMenu] = useState({});
   const [customerName, setCustomerName] = useState('');
